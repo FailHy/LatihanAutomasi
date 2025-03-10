@@ -1,0 +1,31 @@
+name: Laravel Code Linting
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    name: Run Laravel Linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install PHP and Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y php-cli php-mbstring unzip curl
+          curl -sS https://getcomposer.org/installer | php
+          sudo mv composer.phar /usr/local/bin/composer
+          composer install --no-progress --no-interaction --prefer-dist
+      
+      - name: Run PHP CodeSniffer (PSR-12 Standard)
+        run: |
+          composer require --dev squizlabs/php_codesniffer
+          vendor/bin/phpcs --standard=PSR12 app/ routes/ database/
